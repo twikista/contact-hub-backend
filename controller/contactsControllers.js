@@ -1,5 +1,6 @@
 const { url } = require("../config/cloudinary");
 const cloudinary = require("../config/cloudinary");
+const Contact = require("../models/contacts");
 
 const getContacts = (req, res) => {
   res.status(200).json({ message: "GET all contacts" });
@@ -10,18 +11,27 @@ const getContact = (req, res) => {
 };
 
 const createNewContact = async (req, res) => {
-  const { name, image } = req.body;
+  const { firstName, lastName, contactInfo, image, tag } = req.body;
   try {
     if (image) {
-      console.log(name);
-      const cloudres = await cloudinary.uploader.upload(image, {
-        upload_preset: "pics",
+      const imgUploadRes = await cloudinary.uploader.upload(image, {
+        upload_preset: "pally-contacts",
       });
 
-      if (cloudres) {
-        const image = { publicId: cloudres.public_id, url: cloudres.url };
-        const contact = { name, image };
-        console.log(cloudres);
+      if (imgUploadRes) {
+        const img = {
+          publicId: imgUploadRes.public_id,
+          url: imgUploadRes.url,
+        };
+        const contactData = {
+          firstName,
+          lastName,
+          contactInfo,
+          image: img,
+          tag,
+        };
+        const contact = await Contact.create(contactData);
+        // console.log(imgUploadRes);
         res.status(200).json(contact);
       }
     }
