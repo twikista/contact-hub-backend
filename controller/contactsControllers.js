@@ -1,7 +1,9 @@
+const mongoose = require("mongoose");
 const { url } = require("../config/cloudinary");
 const cloudinary = require("../config/cloudinary");
 const Contact = require("../models/contacts");
 
+//get all contacts
 const getContacts = async (req, res) => {
   try {
     const contacts = await Contact.find({});
@@ -11,8 +13,18 @@ const getContacts = async (req, res) => {
   }
 };
 
-const getContact = (req, res) => {
-  res.status(200).json({ message: `GET contact ${req.params.id}` });
+//get single contact by its id
+const getContact = async (req, res) => {
+  const { id } = req.params;
+  //check if id is valid mongoose id type
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ msg: "contact does not exist" });
+  }
+  const contact = await Contact.findById(id);
+  if (!contact) {
+    return res.status(404).json({ msg: "contact does not exist" });
+  }
+  res.status(200).json(contact);
 };
 
 const createNewContact = async (req, res) => {
