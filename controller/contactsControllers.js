@@ -2,8 +2,13 @@ const { url } = require("../config/cloudinary");
 const cloudinary = require("../config/cloudinary");
 const Contact = require("../models/contacts");
 
-const getContacts = (req, res) => {
-  res.status(200).json({ message: "GET all contacts" });
+const getContacts = async (req, res) => {
+  try {
+    const contacts = await Contact.find({});
+    res.status(200).json(contacts);
+  } catch (error) {
+    res.status(400).json({ msg: "request failed" });
+  }
 };
 
 const getContact = (req, res) => {
