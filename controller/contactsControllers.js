@@ -18,11 +18,11 @@ const getContact = async (req, res) => {
   const { id } = req.params;
   //check if id is valid mongoose id type
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ msg: "contact does not exist" });
+    return res.status(404).json({ error: "contact not found" });
   }
   const contact = await Contact.findById(id);
   if (!contact) {
-    return res.status(404).json({ msg: "contact does not exist" });
+    return res.status(404).json({ error: "contact not found" });
   }
   res.status(200).json(contact);
 };
@@ -31,14 +31,14 @@ const createNewContact = async (req, res) => {
   const { firstName, lastName, contactInfo, image, tag } = req.body;
   try {
     if (image) {
-      const imgUploadRes = await cloudinary.uploader.upload(image, {
+      const imageUploadResponse = await cloudinary.uploader.upload(image, {
         upload_preset: "pally-contacts",
       });
 
-      if (imgUploadRes) {
+      if (imageUploadResponse) {
         const img = {
-          publicId: imgUploadRes.public_id,
-          url: imgUploadRes.url,
+          publicId: imageUploadResponse.public_id,
+          url: imageUploadResponse.url,
         };
         const contactData = {
           firstName,
@@ -53,12 +53,56 @@ const createNewContact = async (req, res) => {
       }
     }
   } catch (error) {
-    res.status(400).json({ msg: "failed!" });
+    res.status(404).json({ msg: "failed!" });
   }
 };
 
-const updateContact = (req, res) => {
-  res.status(200).json({ message: `UPDATE contact ${req.params.id}` });
+const updateContact = async (req, res) => {
+  const { id } = req.params;
+  const { newContactImage, contact } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ msg: "" });
+  }
+  if (newContactImage) {
+    const destroyImageRespnse = await cloudinary.uploader.destroy(
+      contact.image.publicId
+    );
+
+    if (destroyImageRespnse) {
+      const imageUploadResponse = await cloudinary.uploader.upload(
+        newContactImage,
+        { upload_preset: "pally-contacts" }
+      );
+
+      if (imageUploadResponse) {
+        const img = {
+          publicId: imageUploadResponse.public_id,
+          url: imageUploadResponse.url,
+        };
+        const updatedContactData = {
+          ...contact,
+          image: img,
+        };
+
+        const updatedContact = await Contact.findOneAndUpdate(
+          { _id: id },
+          updatedContactData
+        );
+
+        if (!updatedContact) {
+          return res.satus(404).json({ msg: "contact not found" });
+        }
+        res.status(200).json(updatedContact);
+      }
+    }
+  } else {
+    const updatedContact = await Contact.findOneAndUpdate({ _id: id }, contact);
+    if (!updatedContact) {
+      return res.satus(404).json({ msg: "contact not found" });
+    }
+    res.status(200).json(updatedContact);
+  }
 };
 
 const deleteContact = (req, res) => {
