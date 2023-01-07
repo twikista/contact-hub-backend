@@ -105,8 +105,17 @@ const updateContact = async (req, res) => {
   }
 };
 
-const deleteContact = (req, res) => {
-  res.status(200).json({ message: `DELETE contact ${req.params.id}` });
+const deleteContact = async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ msg: "contact no found" });
+  }
+
+  const contact = await Contact.findOneAndDelete({ _id: id });
+  if (contact) {
+    return res.status(404).json({ msg: "contact no found" });
+  }
+  res.status(200).json(contact);
 };
 
 module.exports = {
