@@ -17,25 +17,28 @@ const contactInfoSchema = mongoose.Schema({
   city: String,
 });
 
-const contactSchema = mongoose.Schema({
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: {
-    type: String,
-    required: false,
-  },
+const contactSchema = mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: false,
+    },
 
-  contactInfo: contactInfoSchema,
+    contactInfo: contactInfoSchema,
 
-  image: {
-    type: imageSchema,
+    image: {
+      type: imageSchema,
+    },
+    tag: {
+      type: [String],
+      required: false,
+    },
   },
-  tag: {
-    type: [String],
-    required: false,
-  },
-});
+  { timestamps: true }
+);
 
 module.exports = mongoose.model("Contact", contactSchema);

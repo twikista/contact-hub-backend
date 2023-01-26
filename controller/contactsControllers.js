@@ -62,7 +62,7 @@ const updateContact = async (req, res) => {
   const { newContactImage, contact } = req.body;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ msg: "" });
+    return res.status(404).json({ msg: "contact no found" });
   }
   if (newContactImage) {
     const destroyImageRespnse = await cloudinary.uploader.destroy(
@@ -97,24 +97,33 @@ const updateContact = async (req, res) => {
       }
     }
   } else {
-    const updatedContact = await Contact.findOneAndUpdate({ _id: id }, contact);
-    if (!updatedContact) {
-      return res.satus(404).json({ msg: "contact not found" });
+    try {
+      const updatedContact = await Contact.findOneAndUpdate(
+        { _id: id },
+        contact
+      );
+      if (!updatedContact) {
+        return res.satus(404).json({ msg: "contact not found" });
+      }
+      res.status(200).json(updatedContact);
+    } catch (error) {
+      res.status(404).json({ msg: error });
     }
-    res.status(200).json(updatedContact);
   }
 };
 
 const deleteContact = async (req, res) => {
   const { id } = req.params;
+  //check if id is valid mongoose id type
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(404).json({ msg: "contact no found" });
   }
-
   const contact = await Contact.findOneAndDelete({ _id: id });
-  if (contact) {
+  if (!contact) {
     return res.status(404).json({ msg: "contact no found" });
   }
+  //remove deleted contact image from cloudinary
+  await cloudinary.uploader.destroy(contact.image.publicId);
   res.status(200).json(contact);
 };
 
