@@ -82,4 +82,43 @@ const userSignup = async (req, res) => {
   }
 };
 
-module.exports = { userSignup };
+// @desc    Login user
+// @route   POST /users/login
+// @access  Public
+
+const userLogin = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    //check if email and password field are completed
+    if (!email || !password) {
+      res.status(400);
+      throw new Error("complete all fields");
+    }
+    //check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error("incorrect email");
+    }
+    //check if password is correct
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      res.status(400);
+      throw new Error("incorrect password");
+    }
+
+    res.status(201).json({
+      _id: user._id,
+      name: user.fullName,
+      email: user.email,
+      token: generateToken(user._id),
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+};
+
+module.exports = { userSignup, userLogin };
