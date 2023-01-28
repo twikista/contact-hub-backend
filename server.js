@@ -16,7 +16,7 @@ app.use(
 app.use(cors());
 
 app.use("/api/contacts", contactRouter);
-app.use("/users", userRouter);
+// app.use("/users", userRouter);
 
 app.listen(process.env.PORT || 4000, () => {
   console.log(`running on port ${process.env.PORT}`);

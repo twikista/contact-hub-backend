@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const userAvatarSchema = mongoose.Schema({
-  publicId: { type: String, required: true },
-  url: { type: String, required: true },
+  publicId: String,
+  url: String,
 });
 
 const userSchema = mongoose.Schema({
@@ -26,4 +26,14 @@ const userSchema = mongoose.Schema({
   avatar: userAvatarSchema,
 });
 
-module.exports = mongoose("User", userSchema);
+userSchema.virtual("fullName").get(function () {
+  if (this.lastName) {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
+  if (!this.lastName) {
+    return `${this.firstName}`;
+  }
+});
+
+module.exports = mongoose.model("User", userSchema);

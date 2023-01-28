@@ -5,7 +5,7 @@ const {
   createNewContact,
   updateContact,
   deleteContact,
-} = require("../controller/contactsControllers");
+} = require("../controller/contactControllers");
 
 const router = express.Router();
 

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { url } = require("../config/cloudinary");
 const cloudinary = require("../config/cloudinary");
-const Contact = require("../models/contacts");
+const Contact = require("../models/contactModel");
 
 //get all contacts
 const getContacts = async (req, res) => {
@@ -30,28 +30,29 @@ const getContact = async (req, res) => {
 const createNewContact = async (req, res) => {
   const { firstName, lastName, contactInfo, image, tag } = req.body;
   try {
+    let img = { publicId: "", url: "" };
     if (image) {
       const imageUploadResponse = await cloudinary.uploader.upload(image, {
         upload_preset: "pally-contacts",
       });
 
       if (imageUploadResponse) {
-        const img = {
+        img = {
           publicId: imageUploadResponse.public_id,
           url: imageUploadResponse.url,
         };
-        const contactData = {
-          firstName,
-          lastName,
-          contactInfo,
-          image: img,
-          tag,
-        };
-        const contact = await Contact.create(contactData);
-        // console.log(imgUploadRes);
-        res.status(200).json(contact);
       }
     }
+    const contactData = {
+      firstName,
+      lastName,
+      contactInfo,
+      image: img,
+      tag,
+    };
+    const contact = await Contact.create(contactData);
+    // console.log(imgUploadRes);
+    res.status(200).json(contact);
   } catch (error) {
     res.status(404).json({ msg: "failed!" });
   }
