@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const userAvatarSchema = mongoose.Schema({
-  publicId: String,
-  url: String,
+  publicId: { type: String, required: true },
+  url: { type: String, required: true },
 });
 
 const userSchema = mongoose.Schema({
@@ -17,6 +17,7 @@ const userSchema = mongoose.Schema({
   email: {
     type: String,
     required: true,
+    unique: true,
   },
   password: {
     type: String,

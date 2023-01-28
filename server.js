@@ -3,6 +3,7 @@ const conntectDb = require("./config/connectDb");
 const express = require("express");
 const cors = require("cors");
 const contactRouter = require("./routes/contactRoutes");
+const userRouter = require("./routes/userRoutes");
 
 conntectDb();
 //express app
@@ -15,6 +16,7 @@ app.use(
 app.use(cors());
 
 app.use("/api/contacts", contactRouter);
+app.use("/users", userRouter);
 
 app.listen(process.env.PORT || 4000, () => {
   console.log(`running on port ${process.env.PORT}`);
