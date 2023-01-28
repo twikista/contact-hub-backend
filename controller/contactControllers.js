@@ -124,7 +124,10 @@ const deleteContact = async (req, res) => {
     return res.status(404).json({ msg: "contact no found" });
   }
   //remove deleted contact image from cloudinary
-  await cloudinary.uploader.destroy(contact.image.publicId);
+  if (contact.image.publicId) {
+    await cloudinary.uploader.destroy(contact.image.publicId);
+  }
+
   res.status(200).json(contact);
 };
 

@@ -1,22 +1,5 @@
 const mongoose = require("mongoose");
 
-const imageSchema = mongoose.Schema({
-  publicId: String,
-  url: String,
-});
-
-const contactInfoSchema = mongoose.Schema({
-  phone: {
-    type: [Number],
-    required: true,
-  },
-  email: {
-    type: [String],
-    required: false,
-  },
-  city: String,
-});
-
 const contactSchema = mongoose.Schema(
   {
     firstName: {
@@ -28,10 +11,24 @@ const contactSchema = mongoose.Schema(
       required: false,
     },
 
-    contactInfo: contactInfoSchema,
+    contactInfo: {
+      phone: {
+        type: [Number],
+        required: true,
+      },
+      email: {
+        type: [String],
+        required: false,
+      },
+      city: {
+        type: [String],
+        required: false,
+      },
+    },
 
     image: {
-      type: imageSchema,
+      publicId: String,
+      url: String,
     },
     tag: {
       type: [String],
