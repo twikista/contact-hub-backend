@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const contactSchema = mongoose.Schema(
   {
+    user_id: {
+      type: String,
+      required: true,
+    },
     firstName: {
       type: String,
       required: true,
@@ -13,15 +17,15 @@ const contactSchema = mongoose.Schema(
 
     contactInfo: {
       phone: {
-        type: [Number],
+        type: String,
         required: true,
       },
       email: {
-        type: [String],
+        type: String,
         required: false,
       },
       city: {
-        type: [String],
+        type: String,
         required: false,
       },
     },
@@ -30,8 +34,8 @@ const contactSchema = mongoose.Schema(
       publicId: String,
       url: String,
     },
-    tag: {
-      type: [String],
+    category: {
+      type: String,
       required: false,
     },
   },

@@ -6,17 +6,20 @@ const {
   updateContact,
   deleteContact,
 } = require("../controller/contactControllers");
+const protectRoutes = require("../middleware/protectRoutes");
 
 const router = express.Router();
 
-router.get("/", getContacts);
+// router.use(protectRoutes);
 
-router.get("/:id", getContact);
+router.get("/", protectRoutes, getContacts);
 
-router.post("/", createNewContact);
+router.get("/:id", protectRoutes, getContact);
 
-router.put("/:id", updateContact);
+router.post("/", protectRoutes, createNewContact);
 
-router.delete("/:id", deleteContact);
+router.put("/:id", protectRoutes, updateContact);
+
+router.delete("/:id", protectRoutes, deleteContact);
 
 module.exports = router;

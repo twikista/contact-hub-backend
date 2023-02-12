@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
+const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const cloudinary = require("../config/cloudinary");
 //npm install -g npm@9.4.0
@@ -97,12 +98,13 @@ const userLogin = async (req, res) => {
     //check if user exists
     const user = await User.findOne({ email });
     if (!user) {
+      res.status(400).json({ msg: "incorrect email" });
       throw new Error("incorrect email");
     }
     //check if password is correct
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
-      res.status(400);
+      res.status(400).json({ msg: "incorrect password" });
       throw new Error("incorrect password");
     }
 
@@ -117,8 +119,8 @@ const userLogin = async (req, res) => {
   }
 };
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-};
+function generateToken(_id) {
+  return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+}
 
 module.exports = { userSignup, userLogin };

@@ -1,10 +1,5 @@
 const mongoose = require("mongoose");
 
-const userAvatarSchema = mongoose.Schema({
-  publicId: String,
-  url: String,
-});
-
 const userSchema = mongoose.Schema({
   firstName: {
     type: String,
@@ -23,7 +18,10 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  avatar: userAvatarSchema,
+  avatar: {
+    publicId: String,
+    url: String,
+  },
 });
 
 userSchema.virtual("fullName").get(function () {
