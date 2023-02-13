@@ -1,10 +1,10 @@
-const errorHandler = (error, req, res, next) => {
-  const statusCode = res.statusCode ? statusCode : 500;
+const errorHandler = (err, req, res, next) => {
+  res.status(res.statusCode || 500);
 
-  res.status(statusCode);
   res.json({
-    message: error.message,
-    stack: process.env.NODE_ENV === "PRODUCTION" ? null : error.stack,
+    status: err.status,
+    message: err.message,
+    stack: process.env.NODE_ENV === "PRODUCTION" ? null : err.stack,
   });
 };
 
