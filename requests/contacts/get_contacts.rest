@@ -1,0 +1,3 @@
+GET http://localhost:4000/api/contacts/
+Content-Type: application/json
+Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDhjMWE1MjI2NmQzYWZmZWUxOTYxMGYiLCJpYXQiOjE2ODY5MTIyMTMsImV4cCI6MTY4NzUxNzAxM30.2HxCaHTFqSQj9mTJXFz5CDqBIlcjp9barI9aget-Ask
