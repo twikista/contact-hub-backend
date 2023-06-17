@@ -11,11 +11,14 @@
     "validator": "^13.9.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "nodemon": "^2.0.20"
   },
   "scripts": {
-    "start": "node server.js",
-    "server": "nodemon server.js"
+    "start": "cross-env NODE_ENV=poduction node server.js",
+    "dev": "cross-env NODE_ENV=development nodemon server.js",
+    "test": "jest --verbose --runInBand",
+    "start:test": "cross-env NODE_ENV=test node server.js"
   },
   "name": "backend",
   "version": "1.0.0",

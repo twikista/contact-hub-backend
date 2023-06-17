@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose')
 
 const userSchema = mongoose.Schema({
   firstName: {
@@ -14,7 +14,7 @@ const userSchema = mongoose.Schema({
     required: true,
     unique: true,
   },
-  password: {
+  passwordHash: {
     type: String,
     required: true,
   },
@@ -22,16 +22,21 @@ const userSchema = mongoose.Schema({
     publicId: String,
     url: String,
   },
-});
+})
 
-userSchema.virtual("fullName").get(function () {
-  if (this.lastName) {
+userSchema.virtual('fullName').get(function () {
+  const fullName = this.lastName
+    ? `${this.firstName} ${this.lastName}`
+    : `${this.firstName}`
+  return fullName
+
+  /*if (this.lastName) {
     return `${this.firstName} ${this.lastName}`;
   }
 
   if (!this.lastName) {
     return `${this.firstName}`;
-  }
-});
+  }*/
+})
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model('User', userSchema)
