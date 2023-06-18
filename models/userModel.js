@@ -22,6 +22,7 @@ const userSchema = mongoose.Schema({
     publicId: String,
     url: String,
   },
+  contacts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Contact' }],
 })
 
 userSchema.virtual('fullName').get(function () {
@@ -37,6 +38,14 @@ userSchema.virtual('fullName').get(function () {
   if (!this.lastName) {
     return `${this.firstName}`;
   }*/
+})
+
+userSchema.set('toJSON', (document, returnedObject) => {
+  returnedObject.id = returnedObject._id.toString()
+  delete returnedObject._id
+  delete returnedObject.__v
+  //delete passwordHash so its not revealed
+  delete returnedObject.passwordHash
 })
 
 module.exports = mongoose.model('User', userSchema)
