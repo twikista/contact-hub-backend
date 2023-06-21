@@ -1,12 +1,13 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/userModel')
-const asyncHandler = require('express-async-handler')
 
-const protectRoutes = asyncHandler(async (req, res, next) => {
+const protectRoutes = async (req, res, next) => {
   const authorization = req.get('authorization')
   if (authorization && authorization.startsWith('Bearer')) {
     //get token from header
     token = authorization.replace('Bearer ', '')
+
+    //extract id from token
     const { _id } = jwt.verify(token, process.env.JWT_SECRET)
     if (!_id) {
       return res.status(401).json({ error: 'invalid token' })
@@ -17,7 +18,8 @@ const protectRoutes = asyncHandler(async (req, res, next) => {
     next()
   } else {
     res.status(401).json({ error: 'unauthorized request' })
+    next()
   }
-})
+}
 
 module.exports = protectRoutes

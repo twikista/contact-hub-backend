@@ -1,4 +1,4 @@
 POST http://localhost:4000/api/user/login
 Content-Type: application/json
 
-{"email":"mike@gmail.com", "password":"Rekpete@007"}
+{"email":"uzi@gmail.co", "password":"123456"}

@@ -1,25 +1,25 @@
-const express = require("express");
+const express = require('express')
 const {
   getContacts,
   getContact,
   createNewContact,
   updateContact,
   deleteContact,
-} = require("../controller/contactControllers");
-const protectRoutes = require("../middleware/protectRoutes");
+} = require('../controller/contactControllers')
+const protectRoutes = require('../middleware/protectRoutes')
 
-const router = express.Router();
+const router = express.Router()
 
 // router.use(protectRoutes);
 
-router.get("/", protectRoutes, getContacts);
+router.get('/', protectRoutes, getContacts)
 
-router.get("/:id", protectRoutes, getContact);
+router.get('/:id', protectRoutes, getContact)
 
-router.post("/", protectRoutes, createNewContact);
+router.post('/', protectRoutes, createNewContact)
 
-router.put("/:id", protectRoutes, updateContact);
+router.put('/:id', protectRoutes, updateContact)
 
-router.delete("/:id", protectRoutes, deleteContact);
+router.delete('/:id', protectRoutes, deleteContact)
 
-module.exports = router;
+module.exports = router

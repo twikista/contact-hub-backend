@@ -1,208 +1,138 @@
-const mongoose = require("mongoose");
-const asyncHandler = require("express-async-handler");
-const cloudinary = require("../config/cloudinary");
-const Contact = require("../models/contactModel");
-const User = require("../models/contactModel");
+const mongoose = require('mongoose')
+const asyncHandler = require('express-async-handler')
+const cloudinary = require('../config/cloudinary')
+const Contact = require('../models/contactModel')
+const User = require('../models/contactModel')
 
 //get all contacts
-const getContacts = asyncHandler(async (req, res) => {
-  try {
-    const contacts = await Contact.find({ user_id: req.user._id });
-    res.status(200).json(contacts);
-  } catch (error) {
-    res.status(400);
-    throw new Error("request failed");
-  }
-});
+const getContacts = async (req, res) => {
+  const user = req.user
+
+  const contacts = await Contact.find({ user: user.id })
+  res.status(200).json(contacts)
+}
 
 //get single contact by its id
-const getContact = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+const getContact = async (req, res) => {
+  const { id } = req.params
 
-  //check if id is valid mongoose id type
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    res.status(404);
-    throw new Error("contact not found");
-    // return res.status(404).json({ error: "contact not found" });
-  }
-
-  const contact = await Contact.findById(id);
+  const contact = await Contact.findById(id)
 
   if (!contact) {
-    res.status(404);
-    throw new Error("contact not found");
-    // return res.status(404).json({ error: "contact not found" });
+    return res.status(404).json({ error: 'contact not found' })
   }
 
-  if (!req.user) {
-    res.status(401);
-    throw new Error("user not found");
-    // return res.status(401).json({ error: "user not found" });
+  if (contact.user !== req.user._id) {
+    return res.status(401).json({ error: 'Not authorized' })
+  }
+  res.status(200).json(contact)
+}
+
+const createNewContact = async (req, res) => {
+  const { firstName, lastName, contactInfo, image, category } = req.body
+
+  let img = { publicId: '', url: '' }
+
+  const imageUploadResponse = image
+    ? await cloudinary.uploader.upload(image, {
+        upload_preset: 'pally-contacts',
+      })
+    : null
+
+  if (imageUploadResponse) {
+    img.publicId = imageUploadResponse.public_id
+    img.url = imageUploadResponse.url
+  } else {
+    return res.status(500).json({ error: 'server error. please try gain' })
   }
 
-  if (contact.user_id !== req.user.id) {
-    res.status(401);
-    throw new Error("Not authorized");
-    // return res.status(401).json({ error: "Not authorized" });
-  }
-  res.status(200).json(contact);
-});
-
-const createNewContact = asyncHandler(async (req, res) => {
-  const { firstName, lastName, contactInfo, image, category } = req.body;
-  // try {
-  let img = { publicId: "", url: "" };
-  if (image) {
-    const imageUploadResponse = await cloudinary.uploader.upload(image, {
-      upload_preset: "pally-contacts",
-    });
-
-    if (imageUploadResponse) {
-      img = {
-        publicId: imageUploadResponse.public_id,
-        url: imageUploadResponse.url,
-      };
-    }
-  }
-
-  const contactData = {
-    user_id: req.user._id,
+  const contact = new Contact({
     firstName,
     lastName,
     contactInfo,
     image: img,
     category,
-  };
-  // console.log(contactData);
-  const contact = await Contact.create(contactData);
-  if (!contact) {
-    res.status(404);
-    throw new Error("unable to complete");
-  }
-  // console.log(imgUploadRes);
-  res.status(200).json(contact);
-  // } catch (error) {
-  //   res.status(404);
-  //   throw new Error("failed");
-  //   // res.status(404).json({ msg: "failed!" });
-  // }
-});
+    user: req.user._id,
+  })
 
-const updateContact = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const { newContactImage, contact } = req.body;
+  const savedContact = await Contact.save(contact)
+  res.status(200).json(savedContact)
+}
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    res.status(404);
-    throw new Error("contact not found");
-    // return res.status(404).json({ msg: "contact no found" });
-  }
+const updateContact = async (req, res) => {
+  const { id } = req.params
+  const { newContactImage, contact } = req.body
 
-  if (!req.user) {
-    res.status(401);
-    throw new Error("user not found");
-    // return res.status(401).json({ error: "user not found" });
-  }
-
-  if (contact.user_id !== req.user.id) {
-    res.status(401);
-    throw new Error("Not Authorized");
-    // return res.status(401).json({ error: "Not authorized" });
+  if (contact.user !== req.user._id) {
+    return res.status(401).json({ error: 'Not authorized' })
   }
 
   if (newContactImage) {
     const destroyImageResponse = await cloudinary.uploader.destroy(
       contact.image.publicId
-    );
+    )
 
-    if (destroyImageResponse) {
-      const imageUploadResponse = await cloudinary.uploader.upload(
-        newContactImage,
-        { upload_preset: "pally-contacts" }
-      );
+    if (!destroyImageResponse) {
+      return res
+        .status(500)
+        .json({ error: 'something went wron. please try again' })
+    }
 
-      if (imageUploadResponse) {
-        const img = {
-          publicId: imageUploadResponse.public_id,
-          url: imageUploadResponse.url,
-        };
-        const updatedContactData = {
-          ...contact,
-          image: img,
-        };
+    const imageUploadResponse = await cloudinary.uploader.upload(
+      newContactImage,
+      { upload_preset: 'pally-contacts' }
+    )
 
-        const updatedContact = await Contact.findByIdUpdate(
-          id,
-          updatedContactData,
-          { new: true }
-        );
-
-        if (!updatedContact) {
-          res.status(404);
-          throw new Error("contact not found");
-          // return res.satus(404).json({ msg: "contact not found" });
-        }
-        res.status(200).json(updatedContact);
+    if (imageUploadResponse) {
+      const img = {
+        publicId: imageUploadResponse.public_id,
+        url: imageUploadResponse.url,
       }
+      const updatedContactData = {
+        ...contact,
+        image: img,
+      }
+
+      const updatedContact = await Contact.findByIdAndUpdate(
+        id,
+        updatedContactData,
+        { new: true, runValidators: true, context: 'query' }
+      )
+
+      res.status(200).json(updatedContact)
+    } else {
+      return res.status(500).json({ error: 'server error. please try again' })
     }
-  } else {
-    // try {
-    const updatedContact = await Contact.findByIdAndUpdate(id, contact, {
-      new: true,
-    });
-    if (!updatedContact) {
-      res.status(404);
-      throw new Error("contact not found");
-      // return res.satus(404).json({ msg: "contact not found" });
-    }
-    res.status(200).json(updatedContact);
-    // } catch (error) {
-    //   res.status(404);
-    //   throw new Error("failed");
-    //   // res.status(404).json({ msg: error });
-    // }
-  }
-});
-
-const deleteContact = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  //check if id is valid mongoose id type
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    res.status(404);
-    throw new Error("contact not found");
-    // return res.status(404).json({ msg: "contact no found" });
   }
 
-  const contact = await Contact.findById(id);
+  const updatedContact = await Contact.findByIdAndUpdate(id, contact, {
+    new: true,
+    runValidators: true,
+    context: 'query',
+  })
 
-  if (!contact) {
-    res.status(404);
-    throw new Error("contact not found");
-    // return res.status(404).json({ msg: "contact no found" });
-  }
+  res.status(200).json(updatedContact)
+}
 
-  if (!req.user) {
-    res.status(401);
-    throw new Error("user not found");
-    // return res.status(401).json({ error: "user not found" });
-  }
+//Delete
+const deleteContact = async (req, res) => {
+  const { id } = req.params
+
+  const contact = await Contact.findById(id)
 
   if (contact.user_id !== req.user.id) {
-    res.status(401);
-    throw new Error("Not authorized");
-
-    // return res.status(401).json({ error: "Not authorized" });
+    return res.status(401).json({ error: 'Not authorized' })
   }
 
-  await Contact.findOneAndDelete({ _id: id });
+  await Contact.findOneAndDelete({ _id: id })
 
   //remove deleted contact image from cloudinary
   if (contact.image.publicId) {
-    await cloudinary.uploader.destroy(contact.image.publicId);
+    await cloudinary.uploader.destroy(contact.image.publicId)
   }
 
-  res.status(200).json(contact);
-});
+  res.status(200).json(contact)
+}
 
 module.exports = {
   getContacts,
@@ -210,4 +140,4 @@ module.exports = {
   createNewContact,
   updateContact,
   deleteContact,
-};
+}

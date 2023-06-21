@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 const conntectDb = require('./config/connectDb')
 const cors = require('cors')
+require('express-async-errors')
+
 const contactRouter = require('./routes/contactRoutes')
 const userRouter = require('./routes/userRoutes')
 const { errorHandler } = require('./middleware/errorMiddleWare')

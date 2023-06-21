@@ -1,4 +1,4 @@
 POST http://localhost:4000/api/user/signup
 Content-Type: application/json
 
-{"email":"uzi@gmail.com", "name":"Brownson", "password":"Rekpete@007"}
+{"firstName":"Mikey", "lastName":"Raul","email":"uzi@gmail.co", "password":"123456"}
