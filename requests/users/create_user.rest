@@ -1,4 +1,4 @@
-POST http://localhost:4000/api/user/signup
+POST http://localhost:4000/api/users/signup
 Content-Type: application/json
 
-{"firstName":"Mikey", "lastName":"Raul","email":"uzi@gmail.co", "password":"123456"}
+{"firstName":"Martin", "lastName":"Arula","email":"big_mates@gmail.co", "password":"123456"}

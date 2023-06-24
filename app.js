@@ -17,7 +17,7 @@ app.use(
 app.use(cors())
 
 app.use('/api/contacts', contactRouter)
-app.use('/api/user', userRouter)
+app.use('/api/users', userRouter)
 
 app.use(errorHandler)
 

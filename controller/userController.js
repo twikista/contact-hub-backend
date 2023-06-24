@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const validator = require('validator')
-const asyncHandler = require('express-async-handler')
 const User = require('../models/userModel')
 const cloudinary = require('../config/cloudinary')
 
@@ -16,6 +15,12 @@ const getUsers = async (req, res) => {
 const userSignup = async (req, res) => {
   const { firstName, lastName, email, password, avatar } = req.body
   let userAvatar = { publicId: '', url: '' }
+
+  if (password.length < 4) {
+    return res.status(400).json({
+      error: 'password length too short. minimum length is 4 characters',
+    })
+  }
 
   //check if user uploaded avatar and save to Cloudinary
   if (avatar) {
@@ -64,17 +69,18 @@ const userLogin = async (req, res) => {
   if (!email || !password) {
     return res.status(400).json({ error: 'complete all fields' })
   }
+
   //check if user exists
   const user = await User.findOne({ email })
 
   const passwordMatch = await bcrypt.compare(password, user.passwordHash)
   if (!(user && passwordMatch)) {
-    return res.status(400).json({ msg: 'incorrect email or password' })
+    return res.status(401).json({ error: 'incorrect email or password' })
   }
 
   const token = generateToken(user._id)
 
-  res.status(201).json({
+  res.status(200).json({
     id: user._id,
     name: user.fullName,
     email: user.email,

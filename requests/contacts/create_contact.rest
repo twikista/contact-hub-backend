@@ -1,5 +1,5 @@
 POST http://localhost:4000/api/contacts
 Content-Type: application/json
-Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDhjMWE1MjI2NmQzYWZmZWUxOTYxMGYiLCJpYXQiOjE2ODY5MTIyMTMsImV4cCI6MTY4NzUxNzAxM30.2HxCaHTFqSQj9mTJXFz5CDqBIlcjp9barI9aget-Ask
+Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NDkxY2E4YmQ0YWY0ZGI3ZTA5NGE1MDYiLCJpYXQiOjE2ODc0MDk1MDMsImV4cCI6MTY4ODAxNDMwM30.XCfU_FyVt1xP6KSPTlkryvDl2xvEnmGI4Uel_zG1cOM
 
-{"firstName":"abike", "lastName":"Dabiri", "contactInfo":{"phone":"08037205072", "email":"abike@gmail.com", "city":"Abuja"}, "image":"", "category":"friend"}
+{"firstName":"Mikel", "lastName":"Obi", "contactInfo":{"phone":"08037208823", "email":"mikel@gmail.com", "city":"Lagos"}, "image":"", "category":"colleague"}

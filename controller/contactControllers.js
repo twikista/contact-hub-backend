@@ -6,9 +6,9 @@ const User = require('../models/contactModel')
 
 //get all contacts
 const getContacts = async (req, res) => {
-  const user = req.user
+  // const user = req.user
 
-  const contacts = await Contact.find({ user: user.id })
+  const contacts = await Contact.find({})
   res.status(200).json(contacts)
 }
 
@@ -29,21 +29,34 @@ const getContact = async (req, res) => {
 }
 
 const createNewContact = async (req, res) => {
+  // console.log(req.user)
   const { firstName, lastName, contactInfo, image, category } = req.body
 
   let img = { publicId: '', url: '' }
 
-  const imageUploadResponse = image
-    ? await cloudinary.uploader.upload(image, {
-        upload_preset: 'pally-contacts',
-      })
-    : null
+  if (image) {
+    const imageUploadResponse = await cloudinary.uploader.upload(image, {
+      upload_preset: 'pally-contacts',
+    })
 
-  if (imageUploadResponse) {
-    img.publicId = imageUploadResponse.public_id
-    img.url = imageUploadResponse.url
-  } else {
-    return res.status(500).json({ error: 'server error. please try gain' })
+    if (imageUploadResponse) {
+      img.publicId = imageUploadResponse.public_id
+      img.url = imageUploadResponse.url
+
+      const contact = new Contact({
+        firstName,
+        lastName,
+        contactInfo,
+        image: img,
+        category,
+        user: req.user._id,
+      })
+
+      const savedContact = await Contact.save(contact)
+      res.status(200).json(savedContact)
+    } else {
+      return res.status(500).json({ error: 'server error. please try gain' })
+    }
   }
 
   const contact = new Contact({
@@ -55,7 +68,7 @@ const createNewContact = async (req, res) => {
     user: req.user._id,
   })
 
-  const savedContact = await Contact.save(contact)
+  const savedContact = await contact.save(contact)
   res.status(200).json(savedContact)
 }
 
