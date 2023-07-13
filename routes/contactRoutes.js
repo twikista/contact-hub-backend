@@ -12,7 +12,7 @@ const router = express.Router()
 
 // router.use(protectRoutes);
 
-router.get('/', getContacts)
+router.get('/', protectRoutes, getContacts)
 
 router.get('/:id', protectRoutes, getContact)
 

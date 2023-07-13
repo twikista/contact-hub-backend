@@ -4,7 +4,7 @@ const contactSchema = mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: true,
+      required: [true, 'first name is required'],
     },
     lastName: {
       type: String,
@@ -14,7 +14,7 @@ const contactSchema = mongoose.Schema(
     contactInfo: {
       phone: {
         type: String,
-        required: true,
+        required: [true, 'phone number is required'],
       },
       email: {
         type: String,

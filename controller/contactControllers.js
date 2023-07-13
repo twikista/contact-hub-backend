@@ -6,9 +6,9 @@ const User = require('../models/contactModel')
 
 //get all contacts
 const getContacts = async (req, res) => {
-  // const user = req.user
+  const user = req.user
 
-  const contacts = await Contact.find({})
+  const contacts = await Contact.find({ user: user._id })
   res.status(200).json(contacts)
 }
 
@@ -28,6 +28,7 @@ const getContact = async (req, res) => {
   res.status(200).json(contact)
 }
 
+//add new contact
 const createNewContact = async (req, res) => {
   // console.log(req.user)
   const { firstName, lastName, contactInfo, image, category } = req.body
@@ -53,9 +54,9 @@ const createNewContact = async (req, res) => {
       })
 
       const savedContact = await Contact.save(contact)
-      res.status(200).json(savedContact)
+      res.status(201).json(savedContact)
     } else {
-      return res.status(500).json({ error: 'server error. please try gain' })
+      return res.status(500).json({ error: 'server error. please try again' })
     }
   }
 
@@ -69,15 +70,20 @@ const createNewContact = async (req, res) => {
   })
 
   const savedContact = await contact.save(contact)
-  res.status(200).json(savedContact)
+  res.status(201).json(savedContact)
 }
 
+//update contact
 const updateContact = async (req, res) => {
   const { id } = req.params
   const { newContactImage, contact } = req.body
 
-  if (contact.user !== req.user._id) {
-    return res.status(401).json({ error: 'Not authorized' })
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: 'invalid id' })
+  }
+
+  if (contact.user.toString() !== req.user._id.toString()) {
+    return res.status(403).json({ error: 'Not authorized' })
   }
 
   if (newContactImage) {
@@ -88,7 +94,7 @@ const updateContact = async (req, res) => {
     if (!destroyImageResponse) {
       return res
         .status(500)
-        .json({ error: 'something went wron. please try again' })
+        .json({ error: 'something went wrong. please try again' })
     }
 
     const imageUploadResponse = await cloudinary.uploader.upload(
@@ -133,18 +139,23 @@ const deleteContact = async (req, res) => {
 
   const contact = await Contact.findById(id)
 
-  if (contact.user_id !== req.user.id) {
-    return res.status(401).json({ error: 'Not authorized' })
+  if (!contact) {
+    return res.status(400).json({ error: 'invalid contact' })
+  }
+
+  if (contact.user.toString() !== req.user.id.toString()) {
+    return res.status(403).json({ error: 'Not authorized' })
   }
 
   await Contact.findOneAndDelete({ _id: id })
 
   //remove deleted contact image from cloudinary
   if (contact.image.publicId) {
+    console.log('got trigered')
     await cloudinary.uploader.destroy(contact.image.publicId)
   }
 
-  res.status(200).json(contact)
+  res.status(204).end()
 }
 
 module.exports = {

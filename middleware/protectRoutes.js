@@ -10,7 +10,6 @@ const protectRoutes = async (req, res, next) => {
 
     //extract id from token
     const { _id } = jwt.verify(token, process.env.JWT_SECRET)
-    console.log(_id)
     if (!_id) {
       return res.status(401).json({ error: 'invalid token' })
     }
