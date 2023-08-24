@@ -14,6 +14,7 @@ const getUsers = async (req, res) => {
 
 const userSignup = async (req, res) => {
   const { firstName, lastName, email, password, avatar } = req.body
+  console.log(avatar)
   let userAvatar = { publicId: '', url: '' }
 
   if (password.length < 4) {
@@ -82,8 +83,9 @@ const userLogin = async (req, res) => {
 
   res.status(200).json({
     id: user._id,
-    name: user.fullName,
+    name: user.firstName,
     email: user.email,
+    profileImage: user.avatar,
     token,
   })
 }

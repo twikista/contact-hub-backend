@@ -53,7 +53,7 @@ const createNewContact = async (req, res) => {
         user: req.user._id,
       })
 
-      const savedContact = await Contact.save(contact)
+      const savedContact = await contact.save(contact)
       res.status(201).json(savedContact)
     } else {
       return res.status(500).json({ error: 'server error. please try again' })
@@ -77,10 +77,6 @@ const createNewContact = async (req, res) => {
 const updateContact = async (req, res) => {
   const { id } = req.params
   const { newContactImage, contact } = req.body
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: 'invalid id' })
-  }
 
   if (contact.user.toString() !== req.user._id.toString()) {
     return res.status(403).json({ error: 'Not authorized' })
